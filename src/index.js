@@ -1,21 +1,16 @@
-import * as React from 'react'
+/* eslint-disable semi */
+/* eslint-disable quotes */
+import { useState, useEffect } from "react";
+import createActivityDetector from "activity-detector";
 
-export const useMyHook = () => {
-  let [{
-    counter
-  }, setState] = React.useState({
-    counter: 0
-  })
+export function useIdle(options) {
+  const [isIdle, setIsIdle] = useState(false);
+  useEffect(() => {
+    const activityDetector = createActivityDetector(options);
+    activityDetector.on("idle", () => setIsIdle(true));
+    activityDetector.on("active", () => setIsIdle(false));
+    return () => activityDetector.stop();
+  }, []);
 
-  React.useEffect(() => {
-    let interval = window.setInterval(() => {
-      counter++
-      setState({counter})
-    }, 1000)
-    return () => {
-      window.clearInterval(interval)
-    }
-  }, [])
-
-  return counter
+  return isIdle;
 }
